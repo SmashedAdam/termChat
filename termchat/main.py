@@ -10,32 +10,25 @@ import getpass
 from typing_extensions import Annotated
 import importlib
 
-# load config from specific config.yaml file
-cwd = os.getcwd()
-filePath = os.path.dirname(os.path.realpath(__file__))
-os.chdir(filePath)
-with open("config.yaml", "r") as file:
-    cfg = yaml.load(file, Loader=yaml.FullLoader)
-os.chdir(cwd)
 
 # get shell username
 username = getpass.getuser()
 
-# spawns a ollama client object
-host = cfg["host"]  # it's set to http://localhost:11434 for local ollama instance
-client = ollama.Client(host=host)
+host = "localhost:11434"  # it's set to http://localhost:11434 for local ollama instance
 
 # spawns a rich console object and a rich markdown object
 console = Console()
 
 
-def get_ollama_models():
+def get_ollama_models(host):
     """
     Retrieves a list of local Ollama model names using the API.
 
     Returns:
         list: A list of model names.
     """
+
+    client = ollama.Client(host=host)
     try:
         model_names = []
         response = client.list()
@@ -43,17 +36,19 @@ def get_ollama_models():
             model_names.append(item["model"])
         return model_names
     except ConnectionError as e:
-        print(
+        rprint(
             f"[bold red]ERROR:[/bold red] ollama unreachable. \n[yellow]HINT:[/yellow] Please check is ollama running or not. Or, you need to install ollama first."
         )
         return
     except Exception as e:
-        print(f"[bold red]ERROR:[/bold red] {e}")
+        rprint(f"[bold red]ERROR:[/bold red] {e}")
         return
 
 
-def chat_request(prompt, model, md_mode):
-    models = get_ollama_models()  # asks ollama for model list
+def chat_request(prompt, model, md_mode, host):
+    models = get_ollama_models(host)  # asks ollama for model list
+    client = ollama.Client(host=host)
+
     if model is None:
         model = models[0]
         rprint(
@@ -94,31 +89,32 @@ def version():
         rprint(importlib.metadata.version("termchat"))
     except importlib.metadata.PackageNotFoundError:
         rprint("Version not found (package not installed)")
-    rprint(f"[blue]used config:[blue]")
-    rprint(cfg)
 
 
 @app.command()
 def chat(
-    prompt: Annotated[str, typer.Argument()] = None,
-    model: Annotated[str, typer.Option()] = None,
-    md_mode: Annotated[bool, typer.Option()] = False,
-):  # this sends a POST api request to ollama api
+    prompt: Annotated[str, typer.Argument(help="Prompt to send to ollama.")] = None,
+    model: Annotated[str, typer.Option(help="Model to use for chat.")] = None,
+    md_mode: Annotated[bool, typer.Option(help="Use markdown mode or not.")] = False,
+    host: Annotated[
+        str, typer.Option(help="use customized ollama endpoint")
+    ] = "http://localhost:11434",
+):  # this sends a chat request via ollama api using ollama package
 
     if (
         prompt is None and model is None
     ):  # if no prompt or model is provided, asks ollama use first model to greet user.
-        chat_request(f"greet the user. the user is {username}", None, md_mode)
+        chat_request(f"greet the user. the user is {username}", None, md_mode, host)
         return
     elif model is None:  # no model selected
-        chat_request(prompt, None, md_mode)
+        chat_request(prompt, None, md_mode, host)
     else:  # normal chat
-        chat_request(prompt, model, md_mode)
+        chat_request(prompt, model, md_mode, host)
 
 
 @app.command()
-def list_models():
-    models = get_ollama_models()
+def list_models(host: Annotated[str, typer.Option(help="use customized ollama endpoint")] = "http://localhost:11434"):
+    models = get_ollama_models(host)
     rprint("[cyan]Installed models: \n[/cyan]")
     for model in models:
         print(model)
