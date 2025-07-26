@@ -1,6 +1,6 @@
 [project]
 name = "termchat"
-version = "0.1.1"
+version = "0.1.2"
 description = "A lightweight CLI ollama frontend."
 authors = [
     {name = "SmashedAdam",email = "adam.sy.yeung@gmail.com"}
