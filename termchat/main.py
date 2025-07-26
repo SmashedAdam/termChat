@@ -21,7 +21,7 @@ os.chdir(cwd)
 username = getpass.getuser()
 
 # spawns a ollama client object
-host = cfg["host"] # it's set to http://localhost:11434 for local ollama instanceshellingham
+host = cfg["host"] # it's set to http://localhost:11434 for local ollama instance
 client = ollama.Client(host=host)  
 
 # spawns a rich console object and a rich markdown object
@@ -108,7 +108,7 @@ def chat(
 @app.command()
 def list_models():
     models = get_ollama_models()
-    print("[cyan]Installed models: \n[/cyan]")
+    rprint("[cyan]Installed models: \n[/cyan]")
     for model in models:
         print(model)
 
