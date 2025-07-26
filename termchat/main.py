@@ -4,7 +4,6 @@ from rich.console import Console
 from rich.markdown import Markdown
 import ollama
 import yaml
-import json
 import os
 import getpass
 from typing_extensions import Annotated
