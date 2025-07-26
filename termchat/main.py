@@ -21,7 +21,7 @@ os.chdir(cwd)
 username = getpass.getuser()
 
 # spawns a ollama client object
-host = cfg["host"] # it's set to http://localhost:11434 for local ollama instance
+host = cfg["host"] # it's set to http://localhost:11434 for local ollama instanceshellingham
 client = ollama.Client(host=host)  
 
 # spawns a rich console object and a rich markdown object
