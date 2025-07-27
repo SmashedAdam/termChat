@@ -52,7 +52,7 @@ def chat_request(prompt, model, md_mode, host):
     if model is None:
         model = models[0]
         rprint(
-            f"\n[yellow]HINT: [/yellow] you currently don't have any model selected and prompt input. System automactically ran the first model: [italic cyan]{models[0]}[/italic cyan] to assist you. "
+            f"\n[yellow]HINT: [/yellow] you currently don't have any model selected and prompt input. System automatically ran the first model: [italic cyan]{models[0]}[/italic cyan] to assist you. "
         )
         rprint("you can pass [blue]--model[/blue] option to select a model.")
 
@@ -80,11 +80,12 @@ def chat_request(prompt, model, md_mode, host):
 
 
 # bootstrap Typer application
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.command()
 def version():
+    """Show version info."""
     try:
         rprint(importlib.metadata.version("termchat"))
     except importlib.metadata.PackageNotFoundError:
@@ -100,7 +101,7 @@ def chat(
         str, typer.Option(help="use customized ollama endpoint")
     ] = "http://localhost:11434",
 ):  # this sends a chat request via ollama api using ollama package
-
+    """Send a single chat request to ollama."""
     if (
         prompt is None and model is None
     ):  # if no prompt or model is provided, asks ollama use first model to greet user.
@@ -113,11 +114,54 @@ def chat(
 
 
 @app.command()
-def list_models(host: Annotated[str, typer.Option(help="use customized ollama endpoint")] = "http://localhost:11434"):
+def list_models(
+    host: Annotated[
+        str, typer.Option(help="use customized ollama endpoint")
+    ] = "http://localhost:11434",
+):
+    """Query ollama for available models."""
     models = get_ollama_models(host)
     rprint("[cyan]Installed models: \n[/cyan]")
     for model in models:
         print(model)
+
+
+@app.command()
+def ichat(
+    host: Annotated[
+        str, typer.Option(help="use customized ollama endpoint")
+    ] = "http://localhost:11434",
+):
+    """Do interactive chat with ollama."""
+    # ask user to select an existing model
+    rprint("Please select a model to start chatting")
+    models = get_ollama_models(host)
+    rprint("[cyan]Installed models: \n[/cyan]")
+    for model in models: # verify is model present or not
+        print(model)
+    model = input(": ")
+    if model not in models:
+        rprint(
+            "[yellow]WARN: [/yellow] selected model is not installed. Please install the model first."
+        )
+        return # quit if model is not exist on ollama
+    
+    
+    # initialize ollama client
+    rprint("Initializing chat with model: " + model)
+    rprint("Type [green]/quit[/green] to exit")
+    client = ollama.Client(host)
+
+    # greet user
+    chat_request(f"greet the user. the user is {username}", model, False, host)
+    print()
+
+    # main chat loop
+    while True:
+        userPrompt = input("Prompt>>> ")
+        if userPrompt == "/quit":
+            break
+    return
 
 
 if __name__ == "__main__":
