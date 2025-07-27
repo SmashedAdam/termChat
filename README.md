@@ -26,6 +26,13 @@ To send a message with desired model, type:
 termchat --model <model name> <message>
 ```
 
+To check what models had instelled, type:
+
+```bash
+termchat list-models
+```
+
+
 ## Configuration
 
 Termchat by default uses the default ollama endpoint, which is <http://localhost:11434>
