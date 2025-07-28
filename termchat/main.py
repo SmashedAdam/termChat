@@ -116,9 +116,9 @@ app = typer.Typer(no_args_is_help=True)
 def version():
     """Show version info."""
     try:
-        rprint(importlib.metadata.version("termchat"))
+        print(importlib.metadata.version("termchat"))
     except importlib.metadata.PackageNotFoundError:
-        rprint("Version not found (package not installed)")
+        print("Version not found (package not installed)")
 
 
 @app.command()  # TODO: merge to use chat_without_history in future
