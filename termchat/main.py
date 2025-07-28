@@ -45,7 +45,7 @@ def get_ollama_models(host):
         return
 
 
-def chat_without_history(prompt, model, md_mode, host):
+def chat_without_history(prompt, model, flash, host):
     """sends a single chat request. no chat history
 
     Args:
@@ -80,15 +80,15 @@ def chat_without_history(prompt, model, md_mode, host):
         model=model, messages=[{"role": "user", "content": prompt}], stream=True
     )
     full_response = ""
-    if md_mode:
-        rprint("[dark_green]Waiting model to generate...[/dark_green]")
+    if flash is False:
+        rprint("[green]Waiting model to generate...[/green]")
     for (
         chunk
     ) in stream:  # print returned contents in real time, simulate real time chat
         content = chunk["message"]["content"]
-        rprint(content, end="", flush=True) if md_mode is False else None
+        rprint(content, end="", flush=True) if flash is True else None
         full_response += content
-    if md_mode:
+    if flash is False:
         md = Markdown(full_response)
         console.print(md)
     return full_response
@@ -196,7 +196,7 @@ def ichat(
         msg_hist = [
             {
                 "role": "system",
-                "content": f"Your responses should ALWAYS be in plain text. AVOID any markdown formatting like bolding, italics, bullet points, or code blocks AT ALL COST. Instead, you can use arrows, such as '->' to inform the user that is a point. The user is {username}",
+                "content": f"Your responses should ALWAYS be in plain text. AVOID any markdown formatting like bolding, italics, bullet points, or code blocks AT ALL COST. Instead, you can use arrows, such as '->' to inform the user that is a point. The user is {username}. If the user asks how to quit, tell them to type '/quit' to exit.",
             }
         ]
         while True:
@@ -216,7 +216,7 @@ def ichat(
         msg_hist = [
             {
                 "role": "system",
-                "content": f"You are a helpful assistant. The user is {username}Your jos is to answer the user about their questions. RESPOND in MARKDOWN format if needed, such as using point form, headings, bold, italics and code blocks.",
+                "content": f"You are a helpful assistant. The user is {username}Your jos is to answer the user about their questions. RESPOND in MARKDOWN format if needed, such as using point form, headings, bold, italics and code blocks. If the user asks how to quit, tell them to type '/quit' to exit.",
             }
         ]
         while True:
@@ -227,7 +227,7 @@ def ichat(
             msg = {"role": "user", "content": userPrompt}
             # TODO: check num_ctx, handle context window
             # send chat request, including history
-            rprint("[dark_green]Waiting model to respond...[/dark_green]")
+            rprint("[green]Waiting model to respond...[/green]")
             msg_hist, full_response = chat_with_history(
                 msg_hist, msg, host, model, True
             )
