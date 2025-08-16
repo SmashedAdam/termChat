@@ -14,16 +14,15 @@ class ollama_client:
         for model in models_raw["models"]:
             self.models.append(model["model"])
     
-    def chat(self):
+    def chat(self, model, prompt):
         """send chat request to ollama(context aware).
         """
-        pass
+        response = self.client.chat(model, message=[{"role":"user", "content": prompt}], stream=True)
 
     def generate(self, model, prompt): 
         """send chat request to ollama(context free).
-        
         """
-        response = self.client.generate(model, prompt)
+        response = self.client.generate(model, prompt, stream=True)
         return response
 
     def show(self):
@@ -38,7 +37,3 @@ class ollama_client:
         self.info_new.pop("license")
         self.info_new.pop("template")
         return self.info_new
-
-ola = ollama_client("http://100.64.60.10:11434")
-
-print(ola.show())
