@@ -2,6 +2,8 @@
 
 A lightweight CLI ollama frontend.
 
+## INFO: branch `main` is under maintainence. Changes will be make to `dev` branch. Once finished `dev` will be merged to `main`
+
 ## Installation
 
 Run the following command to install termchat (download the wheel file from releases page):
