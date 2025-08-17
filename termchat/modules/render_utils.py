@@ -11,10 +11,11 @@ class renderingEngine:
         
     def renderMarkdown(self, markdown):
         # wait for full response and render it
+
         return
 
     def renderStream(self, stream):
         # directly print every word from model.
         for chunk in stream:
-            rprint(chunk["response"], end="")
+            rprint(chunk, end="")
         return

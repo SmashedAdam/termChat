@@ -23,7 +23,7 @@ def test():
     renderer = renderingEngine()
     print(ola.models)
     model = input("model:")
-    stream = ola.generate(model, "Hello i am adam. who are you?")
+    stream = ola.chat(model, "Hello i am adam. who are you?")
     renderer.renderStream(stream)
 
 

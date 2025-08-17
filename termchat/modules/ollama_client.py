@@ -14,16 +14,22 @@ class ollama_client:
         for model in models_raw["models"]:
             self.models.append(model["model"])
     
-    def chat(self, model, prompt):
+
+    def chat(self, model, prompt, stream=True):
         """send chat request to ollama(context aware).
         """
-        response = self.client.chat(model, message=[{"role":"user", "content": prompt}], stream=True)
+        response = self.client.chat(model, messages=[{"role":"user", "content": prompt}], stream=stream)
+        for chunk in response:
+            yield chunk["message"]["content"]
 
-    def generate(self, model, prompt): 
+
+    def generate(self, model, prompt, stream=True): 
         """send chat request to ollama(context free).
         """
-        response = self.client.generate(model, prompt, stream=True)
-        return response
+        response = self.client.generate(model, prompt, stream)
+        for chunk in response:
+            yield chunk["response"]
+
 
     def show(self):
         """inspect a model and make it into a dictionary. Omit modelfile, license and template since it's quite uselsss.
